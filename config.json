@@ -1,0 +1,15 @@
+{
+    "finish_coords": [
+        42.537265,
+        12.749142
+    ],
+    "scoring_points": {
+        "PP": 5000,
+        "GP": 15000
+    },
+    "num_points": 100,
+    "minimum_distance": 1600000,
+    "min_num_external_provinces": 3,
+    "start_min_distance_from_first_point": 15000,
+    "start_max_distance_from_finish": 450000
+}
