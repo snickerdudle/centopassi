@@ -3,3 +3,4 @@ numpy
 osmnx
 networkx
 matplotlib
+pyrosm

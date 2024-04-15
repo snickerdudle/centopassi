@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from shapely.geometry import Point
 from typing import Optional, Tuple, Union
 from utils import Point
-
+import pyrosm
 
 PointType = Union[Point, Tuple[float, float]]
 
@@ -115,10 +115,14 @@ if __name__ == "__main__":
     point1 = Point.from_lat_long((45.4642, 9.1900))  # Example: Milan
     point2 = Point.from_lat_long((45.4383, 10.9916))  # Example: Verona
 
-    # Get the network
-    G = get_country_network()
+    # Get the OSM file
+    osm = pyrosm.OSM("italy-latest.osm.pbf")
 
-    # Find and plot the shortest path
-    route = find_shortest_path(G, point1, point2)
+    # Get the network graph
+    drive_net = osm.get_network(network_type="driving")
+    print(drive_net)
 
-    print(route)
+    # # Find and plot the shortest path
+    # route = find_shortest_path(G, point1, point2)
+
+    # print(route)
