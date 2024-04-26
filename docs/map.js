@@ -7,7 +7,7 @@ function initMap() {
 
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: 8,
-        center: {lat: 44.0, lng: 10.5}
+        center: piediluco
     });
 
     // Draw circles of 50 to 400 km in radius around Piediluco
@@ -193,6 +193,39 @@ function copyToClipboard(lat, lng) {
     });
 }
 
+
+function reversePath() {
+    path.reverse(); // Reverse the array of path markers
+    updatePathPanel(); // Update the UI panel displaying the path
+    updatePolyline(); // Redraw the polyline to reflect the new order
+}
+
+
+function generateAndOpenGoogleMapsLink() {
+    if (path.length === 0) {
+        alert("No markers in the path.");
+        return;
+    }
+
+    const baseUrl = 'https://www.google.com/maps/dir/';
+    const coordinates = path.map(marker => marker.getPosition().toUrlValue()).join('/');
+    const url = baseUrl + coordinates;
+
+    // Optional: Set a specific zoom level and map center if needed
+    const centerLat = (path[0].getPosition().lat() + path[path.length - 1].getPosition().lat()) / 2;
+    const centerLng = (path[0].getPosition().lng() + path[path.length - 1].getPosition().lng()) / 2;
+    const zoomLevel = '8z'; // You might want to adjust this based on your requirements
+    const completeUrl = `${url}/@${centerLat},${centerLng},${zoomLevel}`;
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(completeUrl).then(() => {
+        console.log('Google Maps URL copied to clipboard:', completeUrl);
+        // Redirect to the Google Maps URL
+        window.open(completeUrl, '_blank');
+    }).catch(err => {
+        console.error('Failed to copy URL to clipboard:', err);
+    });
+}
 
 
 // Call initMap to render the map
