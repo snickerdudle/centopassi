@@ -4,15 +4,69 @@
     <title>Map Display</title>
     <style>
         /* Set the size of the map */
-        #map {
-            height: 400px;
+      #map {
+            height: 100%;
+            width: 80%;
+            float: left;
+            border-radius: 32px;
+        }
+        html, body {
+            height: 100%;
             width: 100%;
+            margin: 0;
+            display: flex;
+            overflow: hidden;
+        }
+        .content {
+            padding: 16px;
+            height: 90%;
+            width: 100%;
+            display: flex;
+        }
+        #path-panel {
+            height: 90vh;
+            width: 20%;
+            float: right;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+            border-left: 1px solid #ccc;
+            padding: 10px;
+        }
+        .path-item {
+            padding: 5px;
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            margin: 5px;
+            cursor: grab;
+        }
+        .path-item:hover {
+            background-color: #dee2e6;
+        }
+        .path-remove {
+            float: right;
+            color: red;
+            cursor: pointer;
         }
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBWXJiZpJWxGBynqLwqe4mAlcWI1kqeLkg"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script>
+
 </head>
 <body>
-    <div id="map"></div>
+    <div class="content">
+      <div id="map"></div>
+      <div id="path-panel">
+        <div id="path-count">Path Items: 0</div>
+        <div id="path-panel-contents"></div>
+        <div id="control-panel">
+          <button onclick="exportPath()">Export Path</button>
+          <input type="file" id="file-input" style="display: none"/>
+          <button onclick="importPath()">Import Path</button>
+        </div>
+      </div>
+    </div>
     <script src="map.js"></script>
 </body>
 </html>
