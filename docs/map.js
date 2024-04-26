@@ -46,6 +46,11 @@ function initMap() {
                 marker.addListener('click', function() {
                     addToPath(marker);
                 });
+
+                // Right-click listener to copy coordinates
+                marker.addListener('rightclick', function() {
+                    copyToClipboard(lat, lng);
+                });
             });
         });
 
@@ -161,6 +166,16 @@ function importPath() {
     });
     fileInput.click(); // Open file dialog
 }
+
+function copyToClipboard(lat, lng) {
+    const coordText = `${lat}, ${lng}`;
+    navigator.clipboard.writeText(coordText).then(() => {
+        console.log('Coordinates copied to clipboard:', coordText);
+    }).catch(err => {
+        console.error('Failed to copy coordinates to clipboard:', err);
+    });
+}
+
 
 
 // Call initMap to render the map
