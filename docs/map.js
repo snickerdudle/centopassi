@@ -3,9 +3,26 @@ let map, path = [], line, markers = [];
 
 // Initialize and add the map
 function initMap() {
+    const piediluco = {lat: 42.53567, lng: 12.75402507};
+
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: 8,
         center: {lat: 44.0, lng: 10.5}
+    });
+
+    // Draw circles of 50 to 400 km in radius around Piediluco
+    const radii = [50000, 100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000]; // radii in meters
+    radii.forEach(radius => {
+        new google.maps.Circle({
+            strokeColor: '#FF0000',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.0,
+            map: map,
+            center: piediluco,
+            radius: radius
+        });
     });
 
 
