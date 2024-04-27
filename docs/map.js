@@ -7,7 +7,8 @@ function initMap() {
 
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: 8,
-        center: piediluco
+        center: piediluco,
+        mapId: "CENTOPASSI_2024_EDITOR"
     });
 
     // Draw circles of 50 to 400 km in radius around Piediluco
@@ -39,23 +40,35 @@ function initMap() {
             Object.keys(data).forEach(key => {
                 const [pointType, lat, lng] = data[key];
                 var color = colors[pointType] || "green"; // Default color if type not found
-                var marker = new google.maps.Marker({
+
+                const markerTag = document.createElement("div");
+
+
+                if (color == "red") {
+                    markerTag.className = "marker-tag gp_marker";
+                } else {
+                    markerTag.className = "marker-tag";
+                }
+                markerTag.textContent = key;
+
+                var marker = new google.maps.marker.AdvancedMarkerElement({
                     position: new google.maps.LatLng(lat, lng),
                     map: map,
                     title: key,
-                    label: {
-                        text: key,
-                        color: 'white',
-                        fontSize: "10px"
-                    },
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        scale: 8, // Size of the marker
-                        fillColor: color,
-                        fillOpacity: 1.0,
-                        strokeColor: color,
-                        strokeWeight: 2
-                    }
+                    content: markerTag
+                    // label: {
+                    //     text: key,
+                    //     color: 'white',
+                    //     fontSize: "10px"
+                    // },
+                    // icon: {
+                    //     path: google.maps.SymbolPath.CIRCLE,
+                    //     scale: 8, // Size of the marker
+                    //     fillColor: color,
+                    //     fillOpacity: 1.0,
+                    //     strokeColor: color,
+                    //     strokeWeight: 2
+                    // }
                 });
                 markers.push(marker);
 
@@ -65,7 +78,7 @@ function initMap() {
                 });
 
                 // Right-click listener to copy coordinates
-                marker.addListener('rightclick', function() {
+                markerTag.addEventListener("contextmenu", (e) => {
                     copyToClipboard(lat, lng);
                 });
             });
@@ -80,17 +93,8 @@ function initMap() {
     });
 }
 
-
-function addToPath(marker) {
-    if (path.includes(marker)) return; // Prevent adding the same marker twice
-
-    path.push(marker);
-    updatePathPanel();
-    updatePolyline();
-}
-
 function updatePolyline() {
-    const pathCoordinates = path.map(marker => marker.getPosition());
+    const pathCoordinates = path.map(marker => marker.position);
     line.setPath(pathCoordinates);
 }
 
@@ -105,7 +109,7 @@ function updatePathPanel() {
     path.forEach((marker, index) => {
         const div = document.createElement('div');
         div.className = 'path-item';
-        div.textContent = marker.getTitle();
+        div.textContent = marker.title;
         div.setAttribute('data-index', index);
 
         const removeBtn = document.createElement('span');
@@ -208,12 +212,12 @@ function generateAndOpenGoogleMapsLink() {
     }
 
     const baseUrl = 'https://www.google.com/maps/dir/';
-    const coordinates = path.map(marker => marker.getPosition().toUrlValue()).join('/');
+    const coordinates = path.map(marker => marker.position.lat + "," + marker.position.lng).join('/');
     const url = baseUrl + coordinates;
 
     // Optional: Set a specific zoom level and map center if needed
-    const centerLat = (path[0].getPosition().lat() + path[path.length - 1].getPosition().lat()) / 2;
-    const centerLng = (path[0].getPosition().lng() + path[path.length - 1].getPosition().lng()) / 2;
+    const centerLat = (path[0].position.lat + path[path.length - 1].position.lat) / 2;
+    const centerLng = (path[0].position.lng + path[path.length - 1].position.lng) / 2;
     const zoomLevel = '8z'; // You might want to adjust this based on your requirements
     const completeUrl = `${url}/@${centerLat},${centerLng},${zoomLevel}`;
 
@@ -226,7 +230,6 @@ function generateAndOpenGoogleMapsLink() {
         console.error('Failed to copy URL to clipboard:', err);
     });
 }
-
 
 // Call initMap to render the map
 window.onload = initMap;
