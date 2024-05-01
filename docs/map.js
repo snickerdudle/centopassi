@@ -1,18 +1,80 @@
-let map, path = [], line, markers = [];
+var map, path = [], line, markers = [];
+var cur_map = "google";
 
+const piediluco = { lat: 42.53567, lng: 12.75402507 };
+const radii = [50000, 100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000]; // radii in meters
+// Define colors for different types of points
+var colors = {
+    "PP": "blue",  // Color for PP points
+    "GP": "red"    // Color for GP points
+};
+
+var center = [piediluco.lat, piediluco.lng];
+var zoom = 9;
+
+
+function initLeafletMap() {
+    console.log(center);
+    // unset the google map
+    var container = L.DomUtil.get('map');
+    if (container != null) {
+        container._leaflet_id = null;
+    }
+    var map = L.map('map').setView(center, zoom);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var finish_line = L.marker([piediluco.lat, piediluco.lng]).addTo(map);
+
+    radii.forEach(radius => {
+        var circle = L.circle([piediluco.lat, piediluco.lng], {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.0,
+            radius: radius
+        }).addTo(map);
+    });
+
+
+    // you can set .my-div-icon styles in CSS
+
+    // Fetch the data from the JSON file in the GitHub repository
+    fetch('https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_2024.json')
+        .then(response => response.json())
+        .then(data => {
+            Object.keys(data).forEach(key => {
+                const [pointType, lat, lng] = data[key];
+                var color = colors[pointType] || "green"; // Default color if type not found
+
+                if (color == "red") {
+                    var myIcon = L.divIcon({ className: 'marker-tag gp_marker', html: key });
+                } else {
+                    var myIcon = L.divIcon({ className: 'marker-tag', html: key });
+                }
+
+                L.marker([lat, lng], { icon: myIcon }).addTo(map);
+
+            });
+        });
+}
 
 // Initialize and add the map
 function initMap() {
-    const piediluco = {lat: 42.53567, lng: 12.75402507};
+    console.log(center);
+    // Clear the map if it already exists
+    if (map) {
+        map = null;
+    }
 
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 8,
-        center: piediluco,
+        zoom: zoom,
+        center: { lat: center[0], lng: center[1] },
         mapId: "CENTOPASSI_2024_EDITOR"
     });
 
+
     // Draw circles of 50 to 400 km in radius around Piediluco
-    const radii = [50000, 100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000]; // radii in meters
     radii.forEach(radius => {
         new google.maps.Circle({
             strokeColor: '#FF0000',
@@ -26,12 +88,16 @@ function initMap() {
         });
     });
 
-
-    // Define colors for different types of points
-    var colors = {
-        "PP": "blue",  // Color for PP points
-        "GP": "red"    // Color for GP points
-    };
+    new google.maps.Circle({
+        strokeColor: '#FF0000',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.0,
+        map: map,
+        center: piediluco,
+        radius: 1000
+    });
 
     // Fetch the data from the JSON file in the GitHub repository
     fetch('https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_2024.json')
@@ -42,7 +108,6 @@ function initMap() {
                 var color = colors[pointType] || "green"; // Default color if type not found
 
                 const markerTag = document.createElement("div");
-
 
                 if (color == "red") {
                     markerTag.className = "marker-tag gp_marker";
@@ -56,24 +121,11 @@ function initMap() {
                     map: map,
                     title: key,
                     content: markerTag
-                    // label: {
-                    //     text: key,
-                    //     color: 'white',
-                    //     fontSize: "10px"
-                    // },
-                    // icon: {
-                    //     path: google.maps.SymbolPath.CIRCLE,
-                    //     scale: 8, // Size of the marker
-                    //     fillColor: color,
-                    //     fillOpacity: 1.0,
-                    //     strokeColor: color,
-                    //     strokeWeight: 2
-                    // }
                 });
                 markers.push(marker);
 
                 // Click listener for each marker
-                marker.addListener('click', function() {
+                marker.addListener('click', function () {
                     addToPath(marker);
                 });
 
@@ -115,7 +167,7 @@ function updatePathPanel() {
         const removeBtn = document.createElement('span');
         removeBtn.textContent = 'x';
         removeBtn.className = 'path-remove';
-        removeBtn.onclick = function() {
+        removeBtn.onclick = function () {
             removeFromPath(index);
         };
 
@@ -124,12 +176,12 @@ function updatePathPanel() {
     });
 
     // Enable reordering via jQuery UI
-    $( "#path-panel-contents" ).sortable({
-        update: function(event, ui) {
-            reorderPath($(this).sortable('toArray', {attribute: 'data-index'}));
+    $("#path-panel-contents").sortable({
+        update: function (event, ui) {
+            reorderPath($(this).sortable('toArray', { attribute: 'data-index' }));
         }
     });
-    $( "#path-panel-contents" ).disableSelection();
+    $("#path-panel-contents").disableSelection();
 }
 
 // Add calls to updatePathPanel in addToPath and removeFromPath to ensure the count updates
@@ -168,11 +220,11 @@ function exportPath() {
 
 function importPath() {
     const fileInput = document.getElementById('file-input');
-    fileInput.addEventListener('change', function(event) {
+    fileInput.addEventListener('change', function (event) {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 const keys = JSON.parse(e.target.result);
                 path = []; // Clear existing path
                 keys.forEach(key => {
@@ -231,5 +283,53 @@ function generateAndOpenGoogleMapsLink() {
     });
 }
 
-// Call initMap to render the map
-window.onload = initMap;
+// Function to store value "map_selection" in the cookies
+function setCookie(name, value, days) {
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+}
+function getCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
+function eraseCookie(name) {
+    document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
+
+function switchMapType() {
+    center = [map.getCenter().lat(), map.getCenter().lng()];
+    zoom = map.getZoom();
+    if (cur_map == "leaflet") {
+        // Set the cookie to "google"
+        cur_map = "google";
+        // Reload the page
+        initMap();
+    } else {
+        // Set the cookie to "leaflet"
+        cur_map = "leaflet";
+        // Reload the page
+        initLeafletMap();
+    }
+}
+
+if (cur_map == "leaflet") {
+    // Call initMap to render the map
+    window.onload = initLeafletMap;
+    updatePolyline();
+} else {
+    // Call initMap to render the map
+    window.onload = initMap;
+    updatePolyline();
+}
+
