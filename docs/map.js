@@ -146,6 +146,8 @@ function initMap() {
         strokeWeight: 2,
         map: map
     });
+
+    $("#maps-count").val(20);
 }
 
 function updatePath() {
@@ -289,18 +291,24 @@ function copyToClipboard(lat, lng) {
 }
 
 function generateAndOpenGoogleMapsLink() {
-    if (path.length === 0) {
+    const n = $("#maps-count").val();
+    var pathx = path.slice(0, path.indexOf(cursor) + 1);
+    if (n < pathx.length) {
+        pathx = pathx.slice(pathx.length - n);
+    }
+
+    if (pathx.length === 0) {
         alert("No markers in the path.");
         return;
     }
 
     const baseUrl = 'https://www.google.com/maps/dir/';
-    const coordinates = path.map(marker => marker.position.lat + "," + marker.position.lng).join('/');
+    const coordinates = pathx.map(marker => marker.position.lat + "," + marker.position.lng).join('/');
     const url = baseUrl + coordinates;
 
     // Optional: Set a specific zoom level and map center if needed
-    const centerLat = (path[0].position.lat + path[path.length - 1].position.lat) / 2;
-    const centerLng = (path[0].position.lng + path[path.length - 1].position.lng) / 2;
+    const centerLat = (pathx[0].position.lat + pathx[pathx.length - 1].position.lat) / 2;
+    const centerLng = (pathx[0].position.lng + pathx[pathx.length - 1].position.lng) / 2;
     const zoomLevel = '8z'; // You might want to adjust this based on your requirements
     const completeUrl = `${url}/@${centerLat},${centerLng},${zoomLevel}`;
 
