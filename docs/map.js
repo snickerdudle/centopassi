@@ -1,4 +1,4 @@
-var map, path = [], line, markers = [];
+var map, path = [], cursor, line, markers = [];
 var cur_map = "google";
 
 const piediluco = { lat: 42.53567, lng: 12.75402507 };
@@ -148,12 +148,7 @@ function initMap() {
     });
 }
 
-function updatePolyline() {
-    const pathCoordinates = path.map(marker => marker.position);
-    line.setPath(pathCoordinates);
-}
-
-function updatePathPanel() {
+function updatePath() {
     const panel = document.getElementById('path-panel-contents');
     const countDiv = document.getElementById('path-count');
     panel.innerHTML = ''; // Clear existing entries
@@ -166,6 +161,8 @@ function updatePathPanel() {
         div.className = 'path-item';
         div.textContent = marker.title;
         div.setAttribute('data-index', index);
+        if (marker === cursor)
+            div.classList.add('cursor');
 
         const removeBtn = document.createElement('span');
         removeBtn.textContent = 'x';
@@ -185,26 +182,28 @@ function updatePathPanel() {
     if (last_circle_15) {
         last_circle_15.setMap(null);
     }
-    last_circle_5 = new google.maps.Circle({
-        strokeColor: '#0000FF',
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: '#FF0000',
-        fillOpacity: 0.0,
-        map: map,
-        center: path[path.length - 1].position,
-        radius: 5000
-    });
-    last_circle_15 = new google.maps.Circle({
-        strokeColor: '#0000FF',
-        strokeOpacity: 0.4,
-        strokeWeight: 2,
-        fillColor: '#FF0000',
-        fillOpacity: 0.0,
-        map: map,
-        center: path[path.length - 1].position,
-        radius: 15000
-    });
+    if (cursor) {
+        last_circle_5 = new google.maps.Circle({
+            strokeColor: '#0000FF',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.0,
+            map: map,
+            center: cursor.position,
+            radius: 5000
+        });
+        last_circle_15 = new google.maps.Circle({
+            strokeColor: '#0000FF',
+            strokeOpacity: 0.4,
+            strokeWeight: 2,
+            fillColor: '#FF0000',
+            fillOpacity: 0.0,
+            map: map,
+            center: cursor.position,
+            radius: 15000
+        });
+    }
 
     // Enable reordering via jQuery UI
     $("#path-panel-contents").sortable({
@@ -213,27 +212,36 @@ function updatePathPanel() {
         }
     });
     $("#path-panel-contents").disableSelection();
+
+    const pathCoordinates = path.map(marker => marker.position);
+    line.setPath(pathCoordinates);
 }
 
 // Add calls to updatePathPanel in addToPath and removeFromPath to ensure the count updates
 function addToPath(marker) {
-    if (path.includes(marker)) return; // Prevent adding the same marker twice
-
-    path.push(marker);
-    updatePathPanel();
-    updatePolyline();
+    if (!path.includes(marker))
+        path.splice(path.indexOf(cursor) + 1, 0, marker);
+    cursor = marker;
+    updatePath();
 }
 
 function removeFromPath(index) {
     path.splice(index, 1);
-    updatePathPanel();
-    updatePolyline();
+    if (!path.includes(cursor) && path.length > 0)
+        cursor = path[path.length - 1];
+    updatePath();
 }
 
 function reorderPath(newOrder) {
     path = newOrder.map(index => path[index]);
-    updatePathPanel();
-    updatePolyline();
+    updatePath();
+}
+
+function reversePath() {
+    path.reverse();
+    if (cursor == path[0])
+        cursor = path[path.length - 1];
+    updatePath();
 }
 
 function exportPath() {
@@ -279,14 +287,6 @@ function copyToClipboard(lat, lng) {
         console.error('Failed to copy coordinates to clipboard:', err);
     });
 }
-
-
-function reversePath() {
-    path.reverse(); // Reverse the array of path markers
-    updatePathPanel(); // Update the UI panel displaying the path
-    updatePolyline(); // Redraw the polyline to reflect the new order
-}
-
 
 function generateAndOpenGoogleMapsLink() {
     if (path.length === 0) {
@@ -357,10 +357,8 @@ function switchMapType() {
 if (cur_map == "leaflet") {
     // Call initMap to render the map
     window.onload = initLeafletMap;
-    updatePolyline();
 } else {
     // Call initMap to render the map
     window.onload = initMap;
-    updatePolyline();
 }
 
