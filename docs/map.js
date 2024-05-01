@@ -322,6 +322,30 @@ function generateAndOpenGoogleMapsLink() {
     });
 }
 
+function generateAndOpenGoogleMapsLinks() {
+    if (path.length === 0) {
+        alert("No markers in the path.");
+        return;
+    }
+
+    const count = 16;
+    var pathx = path;
+    while (pathx.length > 0) {
+        const baseUrl = 'https://www.google.com/maps/dir/';
+        const coordinates = pathx.slice(0, count).map(marker => marker.position.lat + "," + marker.position.lng).join('/');
+        const url = baseUrl + coordinates;
+
+        // Optional: Set a specific zoom level and map center if needed
+        const centerLat = (path[0].position.lat + path[path.length - 1].position.lat) / 2;
+        const centerLng = (path[0].position.lng + path[path.length - 1].position.lng) / 2;
+        const zoomLevel = '8z'; // You might want to adjust this based on your requirements
+        const completeUrl = `${url}/@${centerLat},${centerLng},${zoomLevel}`;
+
+        window.open(completeUrl, '_blank');
+        pathx = pathx.slice(count - 1);
+    }
+}
+
 // Function to store value "map_selection" in the cookies
 function setCookie(name, value, days) {
     var expires = "";
