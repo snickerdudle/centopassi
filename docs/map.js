@@ -9,6 +9,9 @@ var colors = {
     "GP": "red"    // Color for GP points
 };
 
+var last_circle_5 = null;
+var last_circle_15 = null;
+
 var center = [piediluco.lat, piediluco.lng];
 var zoom = 9;
 
@@ -173,6 +176,34 @@ function updatePathPanel() {
 
         div.appendChild(removeBtn);
         panel.appendChild(div);
+    });
+
+    // For the last point in the path, draw a circle around it
+    if (last_circle_5) {
+        last_circle_5.setMap(null);
+    }
+    if (last_circle_15) {
+        last_circle_15.setMap(null);
+    }
+    last_circle_5 = new google.maps.Circle({
+        strokeColor: '#0000FF',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.0,
+        map: map,
+        center: path[path.length - 1].position,
+        radius: 5000
+    });
+    last_circle_15 = new google.maps.Circle({
+        strokeColor: '#0000FF',
+        strokeOpacity: 0.4,
+        strokeWeight: 2,
+        fillColor: '#FF0000',
+        fillOpacity: 0.0,
+        map: map,
+        center: path[path.length - 1].position,
+        radius: 15000
     });
 
     // Enable reordering via jQuery UI
