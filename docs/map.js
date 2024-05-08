@@ -102,6 +102,37 @@ function initMap() {
         radius: 1000
     });
 
+    const createNewMarker = (m_id, color, lat, lng) => {
+        const markerTag = document.createElement("div");
+
+        if (color == "red") {
+            markerTag.className = "marker-tag gp_marker";
+        } else if (color == "black") {
+            markerTag.className = "marker-tag fin_marker"
+        } else {
+            markerTag.className = "marker-tag";
+        }
+        markerTag.textContent = m_id;
+
+        var marker = new google.maps.marker.AdvancedMarkerElement({
+            position: new google.maps.LatLng(lat, lng),
+            map: map,
+            title: m_id,
+            content: markerTag
+        });
+        markers.push(marker);
+
+        // Click listener for each marker
+        marker.addListener('click', function () {
+            addToPath(marker);
+        });
+
+        // Right-click listener to copy coordinates
+        markerTag.addEventListener("contextmenu", (e) => {
+            copyToClipboard(lat, lng);
+        });
+    }
+
     // Fetch the data from the JSON file in the GitHub repository
     fetch('https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_2024.json')
         .then(response => response.json())
@@ -110,40 +141,18 @@ function initMap() {
                 const [pointType, lat, lng] = data[key];
                 var color = colors[pointType] || "green"; // Default color if type not found
 
-                const markerTag = document.createElement("div");
-
-                if (color == "red") {
-                    markerTag.className = "marker-tag gp_marker";
-                } else {
-                    markerTag.className = "marker-tag";
-                }
-                markerTag.textContent = key;
-
-                var marker = new google.maps.marker.AdvancedMarkerElement({
-                    position: new google.maps.LatLng(lat, lng),
-                    map: map,
-                    title: key,
-                    content: markerTag
-                });
-                markers.push(marker);
-
-                // Click listener for each marker
-                marker.addListener('click', function () {
-                    addToPath(marker);
-                });
-
-                // Right-click listener to copy coordinates
-                markerTag.addEventListener("contextmenu", (e) => {
-                    copyToClipboard(lat, lng);
-                });
+                createNewMarker(key, color, lat, lng)
             });
         });
 
+    // Add a black marker for the finish line
+    createNewMarker("FIN", "black", piediluco.lat, piediluco.lng);
+
     // Initialize the polyline
     line = new google.maps.Polyline({
-        strokeColor: '#FF0000',
+        strokeColor: '#000000',
         strokeOpacity: 1.0,
-        strokeWeight: 2,
+        strokeWeight: 3,
         map: map
     });
 
