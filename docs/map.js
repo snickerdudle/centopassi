@@ -165,7 +165,12 @@ function updatePath() {
     panel.innerHTML = ''; // Clear existing entries
 
     // Update the path count
-    countDiv.textContent = 'Path Items: ' + path.length;
+    // Check if the marker wit the title "FIN" is in the path
+    if (path.map(marker => marker.title).includes("FIN")) {
+        countDiv.textContent = 'Path Items: ' + (path.length - 1) + " + 1 (Finish line)";
+    } else {
+        countDiv.textContent = 'Path Items: ' + (path.length) + " (no finish)";
+    }
 
     path.forEach((marker, index) => {
         const div = document.createElement('div');
