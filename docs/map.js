@@ -62,6 +62,21 @@ function initLeafletMap() {
         });
 }
 
+function drawGeoJsonRegions() {
+    fetch('https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_regions.geojson')
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.features);
+            map.data.addGeoJson(data);
+            map.data.setStyle({
+                strokeColor: "gray",
+                strokeOpacity: 0.5,
+                fillColor: "gray",
+                fillOpacity: 0.0
+            })
+        });
+}
+
 // Initialize and add the map
 function initMap() {
     console.log(center);
@@ -148,12 +163,15 @@ function initMap() {
     // Add a black marker for the finish line
     createNewMarker("FIN", "black", piediluco.lat, piediluco.lng);
 
+    drawGeoJsonRegions();
+
     // Initialize the polyline
     line = new google.maps.Polyline({
         strokeColor: '#000000',
         strokeOpacity: 1.0,
         strokeWeight: 3,
-        map: map
+        map: map,
+        zIndex: 10
     });
 
     $("#maps-count").val(20);
