@@ -32,6 +32,7 @@
 <body class="no-point">
     <div class="content">
         <h1 id="point-title">POINT</h1>
+        <p id="point-details">DETAILS</p>
         <p id="point-description">LOADING</p>
     </div>
 </body>
@@ -194,6 +195,7 @@ function checkWithinRadius() {
         let point_lat = points[point_id].lat;
         let point_lng = points[point_id].long;
         let point_type = points[point_id].point_type;
+        let next_point = point_order[point_order.indexOf(point_id) + 1];
 
         // Determine if it is a GP or PP
         let display_name = '';
@@ -213,7 +215,9 @@ function checkWithinRadius() {
             cur_min_point = point_id;
 
             document.getElementById('point-title').innerText = "Closest: " + point_id;
-            document.getElementById('point-description').innerText = "Distance: " + Math.round((distance - acc) * 10) / 10 + "m. ";
+            document.getElementById('point-details').innerText = "Distance: " + Math.round((distance - acc) * 10) / 10 + "m. ";
+            document.getElementById('point-description').innerText = "Desc: " + point_descriptions[point_id] + "\n";
+            document.getElementById('point-description').innerText += "Next (" + next_point + ") desc: " + point_descriptions[next_point];
         }
 
         let is_within_radius = false;
@@ -227,6 +231,9 @@ function checkWithinRadius() {
             console.log('You are within the radius of a ' + display_name);
             document.getElementById('point-title').innerText = display_name;
 
+            document.getElementById('point-details').innerText = " Next: " + next_point;
+            document.getElementById('point-description').innerText = "Next desc: " + point_descriptions[next_point] + ")";
+
             // Make the background color green by adding the class
             document.body.classList.remove('no-point');
             document.body.classList.add('successful-point');
@@ -235,10 +242,6 @@ function checkWithinRadius() {
 
     }
 
-    // Now that we know what our closest point is, we can display the description for the next point
-    let next_point = point_order[point_order.indexOf(cur_min_point) + 1];
-    document.getElementById('point-description').innerText += " Next: " + next_point;
-    document.getElementById('point-description').innerText += " (" + point_descriptions[next_point] + ")";
 }
 
 executeUpdate();
