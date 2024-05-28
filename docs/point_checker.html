@@ -13,9 +13,23 @@
         .content {
             text-align: center;
         }
+        h1 {
+            font-size: 6em;
+        }
+        p {
+            font-size: 3em;
+        }
+        .no-point {
+            background-color: black;
+            color: white;
+        }
+        .successful-point {
+            background-color: green;
+            color: white;
+        }
     </style>
 </head>
-<body>
+<body class="no-point">
     <div class="content">
         <h1 id="point-title">POINT</h1>
         <p id="point-description">LOADING</p>
@@ -24,11 +38,111 @@
 <script>
 // Data goes here
 points = { '550': { 'lat': 39.98789225728855, 'long': 15.72061563659077, 'point_type': 'pp' }, '703': { 'lat': 40.01762826992117, 'long': 15.73049437985936, 'point_type': 'pp' }, '732': { 'lat': 40.09327641475824, 'long': 15.80957076899939, 'point_type': 'gp' }, '679': { 'lat': 40.14060757841354, 'long': 15.98428282604154, 'point_type': 'pp' }, '680': { 'lat': 40.14849172160782, 'long': 15.97322627400474, 'point_type': 'pp' }, '721': { 'lat': 40.16487706099758, 'long': 15.99193538321915, 'point_type': 'pp' }, '661': { 'lat': 40.27591704503317, 'long': 16.00127211467009, 'point_type': 'gp' }, '683': { 'lat': 40.35272250502548, 'long': 15.9751599480121, 'point_type': 'pp' }, '723': { 'lat': 40.37621361876374, 'long': 15.86615084013699, 'point_type': 'gp' }, '685': { 'lat': 40.40646694470495, 'long': 15.81969186611675, 'point_type': 'gp' }, '710': { 'lat': 40.43693923309788, 'long': 15.80496394503865, 'point_type': 'pp' }, '720': { 'lat': 40.473136679391, 'long': 15.7626591194511, 'point_type': 'pp' }, '690': { 'lat': 40.50301420061763, 'long': 15.7656865069589, 'point_type': 'pp' }, '707': { 'lat': 40.57459440379106, 'long': 15.86030874948103, 'point_type': 'pp' }, '705': { 'lat': 40.56401043316567, 'long': 15.83809598302635, 'point_type': 'pp' }, '696': { 'lat': 40.67977565427107, 'long': 15.74211026513977, 'point_type': 'pp' }, '698': { 'lat': 40.73348809467724, 'long': 15.74259327543483, 'point_type': 'pp' }, '667': { 'lat': 40.76143872479967, 'long': 15.74486919601775, 'point_type': 'pp' }, '697': { 'lat': 40.74702427713682, 'long': 15.66187132350974, 'point_type': 'pp' }, '699': { 'lat': 40.76962771601572, 'long': 15.61078623881168, 'point_type': 'pp' }, '700': { 'lat': 40.78908142420909, 'long': 15.5629762223159, 'point_type': 'pp' }, '731': { 'lat': 40.81441342618515, 'long': 15.52902349031355, 'point_type': 'pp' }, '701': { 'lat': 40.8032342267938, 'long': 15.40988061333038, 'point_type': 'pp' }, '725': { 'lat': 40.84778190524171, 'long': 15.4175489523468, 'point_type': 'pp' }, '538': { 'lat': 40.84426879217068, 'long': 15.3699681339909, 'point_type': 'pp' }, '524': { 'lat': 40.83834999711581, 'long': 15.30290599803746, 'point_type': 'pp' }, '556': { 'lat': 40.89570171784023, 'long': 15.36679288658072, 'point_type': 'pp' }, '542': { 'lat': 40.93272837792928, 'long': 15.24253329576938, 'point_type': 'pp' }, '536': { 'lat': 40.93276743027732, 'long': 15.18618733420485, 'point_type': 'pp' }, '502': { 'lat': 40.9055566132518, 'long': 15.14337447356752, 'point_type': 'pp' }, '728': { 'lat': 40.97473630380055, 'long': 15.14619365476279, 'point_type': 'gp' }, '513': { 'lat': 41.0523978566082, 'long': 15.23561066155415, 'point_type': 'pp' }, '621': { 'lat': 41.11948004767475, 'long': 15.29129743974051, 'point_type': 'pp' }, '622': { 'lat': 41.15167815404847, 'long': 15.37928304113408, 'point_type': 'pp' }, '616': { 'lat': 41.16066869246331, 'long': 15.3405553107262, 'point_type': 'pp' }, '618': { 'lat': 41.16621638702061, 'long': 15.25985244654598, 'point_type': 'pp' }, '640': { 'lat': 41.20788349594432, 'long': 15.31561882289618, 'point_type': 'pp' }, '615': { 'lat': 41.27924366368069, 'long': 15.26803400984934, 'point_type': 'pp' }, '631': { 'lat': 41.35956913726326, 'long': 15.30504144159294, 'point_type': 'pp' }, '589': { 'lat': 41.31879042195124, 'long': 15.17961675850649, 'point_type': 'pp' }, '591': { 'lat': 41.32803712788453, 'long': 15.14783063252807, 'point_type': 'pp' }, '597': { 'lat': 41.34445730475987, 'long': 15.13216638989933, 'point_type': 'pp' }, '590': { 'lat': 41.36998124831862, 'long': 15.17184898487383, 'point_type': 'pp' }, '596': { 'lat': 41.37631206093748, 'long': 15.1671761549407, 'point_type': 'gp' }, '595': { 'lat': 41.41364150621622, 'long': 15.11111997129917, 'point_type': 'pp' }, '599': { 'lat': 41.48146262110394, 'long': 15.12486550408262, 'point_type': 'pp' }, '592': { 'lat': 41.52767626577138, 'long': 15.07924195985152, 'point_type': 'pp' }, '593': { 'lat': 41.53161747972737, 'long': 15.0517874056763, 'point_type': 'pp' }, '554': { 'lat': 41.44558246339105, 'long': 14.92909173570661, 'point_type': 'pp' }, '214': { 'lat': 41.48199720090869, 'long': 14.83429838155145, 'point_type': 'pp' }, '553': { 'lat': 41.40151160570849, 'long': 14.80610666590175, 'point_type': 'pp' }, '224': { 'lat': 41.46615223929302, 'long': 14.71726015124412, 'point_type': 'pp' }, '236': { 'lat': 41.43226178109691, 'long': 14.61679999760811, 'point_type': 'gp' }, '532': { 'lat': 41.38006348787099, 'long': 14.63765655913461, 'point_type': 'pp' }, '515': { 'lat': 41.35667528394644, 'long': 14.60101839147006, 'point_type': 'pp' }, '235': { 'lat': 41.40117661157771, 'long': 14.56610960642288, 'point_type': 'pp' }, '517': { 'lat': 41.37971282846493, 'long': 14.50095107270202, 'point_type': 'pp' }, '520': { 'lat': 41.42909670389341, 'long': 14.35471709822653, 'point_type': 'pp' }, '543': { 'lat': 41.40973029695771, 'long': 14.37135371757299, 'point_type': 'pp' }, '521': { 'lat': 41.39590420148448, 'long': 14.4181189040709, 'point_type': 'pp' }, '519': { 'lat': 41.42659643616652, 'long': 14.45443999480232, 'point_type': 'pp' }, '227': { 'lat': 41.44173160032069, 'long': 14.43119415726494, 'point_type': 'pp' }, '201': { 'lat': 41.46164861498238, 'long': 14.39293946664132, 'point_type': 'pp' }, '221': { 'lat': 41.49487877489616, 'long': 14.34463663930256, 'point_type': 'gp' }, '217': { 'lat': 41.56263964297915, 'long': 14.37166920504568, 'point_type': 'pp' }, '216': { 'lat': 41.58354665185961, 'long': 14.41730784340104, 'point_type': 'pp' }, '218': { 'lat': 41.59975227717529, 'long': 14.44791463275418, 'point_type': 'pp' }, '219': { 'lat': 41.61172267572332, 'long': 14.41555023128531, 'point_type': 'pp' }, '220': { 'lat': 41.61551349063702, 'long': 14.37928103265117, 'point_type': 'pp' }, '229': { 'lat': 41.62389463423928, 'long': 14.40413795883599, 'point_type': 'pp' }, '204': { 'lat': 41.72874073029229, 'long': 14.36219765753612, 'point_type': 'pp' }, '230': { 'lat': 41.74921715227389, 'long': 14.3601628968292, 'point_type': 'pp' }, '233': { 'lat': 41.77421901097586, 'long': 14.23937902459996, 'point_type': 'pp' }, '203': { 'lat': 41.71504265691963, 'long': 14.29472323662679, 'point_type': 'pp' }, '208': { 'lat': 41.69765140829771, 'long': 14.23224723959363, 'point_type': 'pp' }, '202': { 'lat': 41.63992388292815, 'long': 14.26581381359904, 'point_type': 'pp' }, '231': { 'lat': 41.6479333857566, 'long': 14.24285696754482, 'point_type': 'pp' }, '205': { 'lat': 41.64493292837305, 'long': 14.2137190112319, 'point_type': 'pp' }, '232': { 'lat': 41.70567949349591, 'long': 14.14649847600512, 'point_type': 'pp' }, '213': { 'lat': 41.63683585134947, 'long': 14.07133896644731, 'point_type': 'pp' }, '225': { 'lat': 41.65251666666666, 'long': 14.0598, 'point_type': 'pp' }, '168': { 'lat': 41.69597618711691, 'long': 13.98857012428937, 'point_type': 'pp' }, '177': { 'lat': 41.71375251038402, 'long': 14.02200620394687, 'point_type': 'pp' }, '150': { 'lat': 41.7424793537741, 'long': 13.98905770718783, 'point_type': 'pp' }, '173': { 'lat': 41.84701538007779, 'long': 13.928302076537, 'point_type': 'pp' }, '190': { 'lat': 41.94285800342643, 'long': 13.82941842103161, 'point_type': 'pp' }, '189': { 'lat': 41.98331526866889, 'long': 13.81339347994521, 'point_type': 'gp' }, '188': { 'lat': 41.99586610617219, 'long': 13.80381519880246, 'point_type': 'pp' }, '153': { 'lat': 42.04759288994249, 'long': 13.74407058357807, 'point_type': 'pp' }, '196': { 'lat': 42.06519504245509, 'long': 13.70621889020327, 'point_type': 'pp' }, '160': { 'lat': 42.18656352006383, 'long': 13.54761220735881, 'point_type': 'pp' }, '178': { 'lat': 42.23204689957694, 'long': 13.48850430670849, 'point_type': 'pp' }, '152': { 'lat': 42.2442534972734, 'long': 13.48722921180149, 'point_type': 'pp' }, '154': { 'lat': 42.30127901876731, 'long': 13.66435308167259, 'point_type': 'pp' }, '187': { 'lat': 42.325881, 'long': 13.684344, 'point_type': 'pp' }, '186': { 'lat': 42.33560764617614, 'long': 13.77682669295665, 'point_type': 'pp' }, '191': { 'lat': 42.3649581485379, 'long': 13.72660056182892, 'point_type': 'pp' }, '155': { 'lat': 42.39516120238282, 'long': 13.78672641227692, 'point_type': 'pp' }, '198': { 'lat': 42.40469244048276, 'long': 13.71231955232133, 'point_type': 'gp' }, '163': { 'lat': 42.38589679344182, 'long': 13.66133425158898, 'point_type': 'pp' }, '174': { 'lat': 42.4092597831684, 'long': 13.58620790599114, 'point_type': 'pp' }, '183': { 'lat': 42.4427115410957, 'long': 13.55892244015643, 'point_type': 'pp' }, '172': { 'lat': 42.45775267387697, 'long': 13.36855137462139, 'point_type': 'pp' }, '162': { 'lat': 42.41592672691727, 'long': 13.20044810491978, 'point_type': 'pp' }, '157': { 'lat': 42.37686581979289, 'long': 13.20483099280538, 'point_type': 'pp' }, '83': { 'lat': 42.37361024743713, 'long': 13.0888063142258, 'point_type': 'pp' }, '92': { 'lat': 42.48683937771334, 'long': 13.12827627400699, 'point_type': 'pp' }, '89': { 'lat': 42.56480028098714, 'long': 12.91504577714431, 'point_type': 'pp' }, '86': { 'lat': 42.47404008481391, 'long': 13.00628278612185, 'point_type': 'gp' }, '75': { 'lat': 42.51499434092467, 'long': 12.88351160821442, 'point_type': 'gp' } }
-point_descriptions = {}
-point_order = ['550', '703', '732', '679', '680', '721', '661', '683', '723', '685', '710', '720', '690', '707', '705', '696', '698', '667', '697', '699', '700', '731', '701', '725', '538', '524', '556', '542', '536', '502', '728', '513', '621', '622', '616', '618', '640', '615', '631', '589', '591', '597', '590', '596', '595', '599', '592', '593', '554', '214', '553', '224', '236', '532', '515', '235', '517', '520', '543', '521', '519', '227', '201', '221', '217', '216', '218', '219', '220', '229', '204', '230', '233', '203', '208', '202', '231', '205', '232', '213', '225', '168', '177', '150', '173', '190', '189', '188', '153', '196', '160', '178', '152', '154', '187', '186', '191', '155', '198', '163', '174', '183', '172', '162', '157', '83', '92', '89', '86', '75']
+// Add the hotel
+points["Grand"] = { 'lat': 40.037186359800025, 'long': 15.286005608683055, 'point_type': 'gp' }
+
+
+
+// Copy the point descriptions here from Notion
+point_descriptions_str = `550
+
+IMPORTANT - Leg it. Get all the way to the terrace. Make sure we go as west as possible on the topmost road
+
+703
+
+All good
+
+732
+
+Make sure to go around the lake fully.
+
+680
+
+All good, just make sure we don't take the big SS653
+
+679
+
+Make it up the little road
+
+721
+
+In the city. Don't need to get too close. 
+
+683
+
+Enjoy the windmills!
+
+723
+
+Parking area is in the radius.
+
+685
+
+Parking area, piano imperator
+
+710
+
+All good, regular road
+
+720
+
+IMPORTANT - Leg it. Pull over South of bridge, and walk over. The point is in the middle of the field
+
+690
+
+Pass through on road 
+
+707
+
+Pass through on road
+
+705
+
+Pass through on road
+
+696
+
+CROSSING POTENZA. Make sure to follow instructions closely
+
+698
+
+All good, pass through
+
+667
+
+All good
+
+697
+
+Calimoto being dumb. Don't double back on via fortuna, just continue north after the point.
+
+699
+
+SPICY. Have to take the unmarked road. Turn off onto a small unpaved road. PUMP YO FIST FOR ME, REPEAT AFTER ME “NO FLAT TIRES ALLOWED!”
+
+700
+
+All good
+
+731
+
+SPICY. 1km before you get to the point, take a right and ride 200 meters down off the road`
+
+
+// Convert the string to a dictionary
+split_descriptions = point_descriptions_str.split('\n\n');
+// Odd indices are the point ids, even indices are the descriptions
+point_descriptions = {};
+for (let i = 0; i < split_descriptions.length; i += 2) {
+    point_descriptions[split_descriptions[i]] = split_descriptions[i + 1];
+}
+
+
+point_order = ["Grand", '550', '703', '732', '679', '680', '721', '661', '683', '723', '685', '710', '720', '690', '707', '705', '696', '698', '667', '697', '699', '700', '731', '701', '725', '538', '524', '556', '542', '536', '502', '728', '513', '621', '622', '616', '618', '640', '615', '631', '589', '591', '597', '590', '596', '595', '599', '592', '593', '554', '214', '553', '224', '236', '532', '515', '235', '517', '520', '543', '521', '519', '227', '201', '221', '217', '216', '218', '219', '220', '229', '204', '230', '233', '203', '208', '202', '231', '205', '232', '213', '225', '168', '177', '150', '173', '190', '189', '188', '153', '196', '160', '178', '152', '154', '187', '186', '191', '155', '198', '163', '174', '183', '172', '162', '157', '83', '92', '89', '86', '75' 
+]
 
 // Safety radius
-const safety_radius = 25;
+const safety_radius = 15;
 // 100 meters for GP
 const gp_radius = 100;
 // 150 meters for PP
@@ -73,6 +187,7 @@ const executeUpdate = () => {
 
 function checkWithinRadius() {
     let cur_min_distance = 1000000000;
+    let cur_min_point = null;
 
     // Check if the current location is within the radius of any point
     for (let point_id in points) {
@@ -81,14 +196,26 @@ function checkWithinRadius() {
         let point_type = points[point_id].point_type;
 
         // Determine if it is a GP or PP
+        let display_name = '';
         if (point_type === 'gp') {
-            const display_name = 'GP ' + point_id;
+            display_name = 'GP ' + point_id;
         } else if (point_type === 'pp') {
-            const display_name = 'PP ' + point_id;
+            display_name = 'PP ' + point_id;
         }
 
         let distance = getDistanceFromLatLonInM(lat, lng, point_lat, point_lng);
-        distance -= acc;  // Subtract the accuracy to make sure the user is within the radius
+        console.log(distance);
+        distance += acc;  // Add the accuracy to make sure the user is within the radius
+        console.log('Adjusted distance: ' + distance);
+
+        if (distance < cur_min_distance) {
+            cur_min_distance = distance;
+            cur_min_point = point_id;
+
+            document.getElementById('point-title').innerText = "Closest: " + point_id;
+            document.getElementById('point-description').innerText = "Distance: " + Math.round((distance - acc) * 10) / 10 + "m. ";
+        }
+
         let is_within_radius = false;
         if (point_type === 'gp') {
             is_within_radius = distance < (gp_radius - safety_radius);
@@ -96,21 +223,22 @@ function checkWithinRadius() {
             is_within_radius = distance < (pp_radius - safety_radius);
         }
 
-        if (distance < cur_min_distance) {
-            cur_min_distance = distance;
-            document.getElementById('point-title').innerText = "Closest: " + point_id;
-            document.getElementById('point-description').innerText = "Distance: " + distance + "m. " + ("Description: " + (point_descriptions[point_id] || "No description available"));
-
-        }
-
         if (is_within_radius) {
             console.log('You are within the radius of a ' + display_name);
             document.getElementById('point-title').innerText = display_name;
-            document.getElementById('point-description').innerText = point_descriptions[point_id] || 'No description available';
+
+            // Make the background color green by adding the class
+            document.body.classList.remove('no-point');
+            document.body.classList.add('successful-point');
             break;
         }
 
     }
+
+    // Now that we know what our closest point is, we can display the description for the next point
+    let next_point = point_order[point_order.indexOf(cur_min_point) + 1];
+    document.getElementById('point-description').innerText += " Next: " + next_point;
+    document.getElementById('point-description').innerText += " (" + point_descriptions[next_point] + ")";
 }
 
 executeUpdate();
