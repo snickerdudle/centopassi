@@ -11,6 +11,8 @@ var colors = {
 
 var last_circle_5 = null;
 var last_circle_15 = null;
+var gps_tolerance_radius_gp = null;
+var gps_tolerance_radius_pp = null;
 
 var center = [piediluco.lat, piediluco.lng];
 var zoom = 9;
@@ -216,6 +218,12 @@ function updatePath() {
     if (last_circle_15) {
         last_circle_15.setMap(null);
     }
+    if (gps_tolerance_radius_pp) {
+        gps_tolerance_radius_pp.setMap(null);
+    }
+    if (gps_tolerance_radius_gp) {
+        gps_tolerance_radius_gp.setMap(null);
+    }
     if (cursor) {
         last_circle_5 = new google.maps.Circle({
             strokeColor: '#0000FF',
@@ -237,6 +245,29 @@ function updatePath() {
             center: cursor.position,
             radius: 15000
         });
+        if (cursor.content.className.includes("gp_marker")) {
+            gps_tolerance_radius_gp = new google.maps.Circle({
+                strokeColor: '#FFFF00',
+                strokeOpacity: 0.4,
+                strokeWeight: 2,
+                fillColor: '#FFFF00',
+                fillOpacity: 0.1,
+                map: map,
+                center: cursor.position,
+                radius: 100
+            });
+        } else {
+            gps_tolerance_radius_pp = new google.maps.Circle({
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.4,
+                strokeWeight: 2,
+                fillColor: '#FF0000',
+                fillOpacity: 0.1,
+                map: map,
+                center: cursor.position,
+                radius: 150
+            });
+        }
     }
 
     // Enable reordering via jQuery UI
