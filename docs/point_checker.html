@@ -17,7 +17,7 @@
             font-size: 6em;
         }
         p {
-            font-size: 3em;
+            font-size: 4.5em;
         }
         .no-point {
             background-color: black;
@@ -235,14 +235,16 @@ function checkWithinRadius() {
         let point_lat = points[point_id].lat;
         let point_lng = points[point_id].long;
         let point_type = points[point_id].point_type;
-        let next_point = point_order[point_order.indexOf(point_id) + 1];
+
+        point_idx = point_order.indexOf(point_id);
+        let next_point = point_order[point_idx + 1];
 
         // Determine if it is a GP or PP
         let display_name = '';
         if (point_type === 'gp') {
-            display_name = 'GP ' + point_id;
+            display_name = 'GP ' + point_id + ' (#' + point_idx + ')';
         } else if (point_type === 'pp') {
-            display_name = 'PP ' + point_id;
+            display_name = 'PP ' + point_id + ' (#' + point_idx + ')';
         }
 
         let distance = getDistanceFromLatLonInM(lat, lng, point_lat, point_lng);
@@ -278,6 +280,10 @@ function checkWithinRadius() {
             document.body.classList.remove('no-point');
             document.body.classList.add('successful-point');
             break;
+        } else {
+            // Make the background color black by removing the class
+            document.body.classList.add('no-point');
+            document.body.classList.remove('successful-point');
         }
 
     }
