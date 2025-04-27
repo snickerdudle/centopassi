@@ -45,7 +45,7 @@ function initLeafletMap() {
     // you can set .my-div-icon styles in CSS
 
     // Fetch the data from the JSON file in the GitHub repository
-    fetch('https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_2024.json')
+    fetch('https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_2025.json')
         .then(response => response.json())
         .then(data => {
             Object.keys(data).forEach(key => {
@@ -90,7 +90,7 @@ function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: zoom,
         center: { lat: center[0], lng: center[1] },
-        mapId: "CENTOPASSI_2024_EDITOR"
+        mapId: "CENTOPASSI_2025_EDITOR"
     });
 
 
@@ -151,7 +151,7 @@ function initMap() {
     }
 
     // Fetch the data from the JSON file in the GitHub repository
-    fetch('https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_2024.json')
+    fetch('https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_2025.json')
         .then(response => response.json())
         .then(data => {
             Object.keys(data).forEach(key => {
