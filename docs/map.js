@@ -1,7 +1,7 @@
 var map, path = [], cursor, line, markers = [];
 var cur_map = "google";
 
-const piediluco = { lat: 42.53567, lng: 12.75402507 };
+const villaleri = { lat: 43.93066494461769, lng: 12.589408458124268 };
 const radii = [50000, 100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000]; // radii in meters
 // Define colors for different types of points
 var colors = {
@@ -14,7 +14,7 @@ var last_circle_15 = null;
 var gps_tolerance_radius_gp = null;
 var gps_tolerance_radius_pp = null;
 
-var center = [piediluco.lat, piediluco.lng];
+var center = [villaleri.lat, villaleri.lng];
 var zoom = 9;
 
 
@@ -30,10 +30,10 @@ function initLeafletMap() {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    var finish_line = L.marker([piediluco.lat, piediluco.lng]).addTo(map);
+    var finish_line = L.marker([villaleri.lat, villaleri.lng]).addTo(map);
 
     radii.forEach(radius => {
-        var circle = L.circle([piediluco.lat, piediluco.lng], {
+        var circle = L.circle([villaleri.lat, villaleri.lng], {
             color: 'red',
             fillColor: '#f03',
             fillOpacity: 0.0,
@@ -94,7 +94,7 @@ function initMap() {
     });
 
 
-    // Draw circles of 50 to 400 km in radius around Piediluco
+    // Draw circles of 50 to 400 km in radius around finish line
     radii.forEach(radius => {
         new google.maps.Circle({
             strokeColor: '#FF0000',
@@ -103,7 +103,7 @@ function initMap() {
             fillColor: '#FF0000',
             fillOpacity: 0.0,
             map: map,
-            center: piediluco,
+            center: villaleri,
             radius: radius
         });
     });
@@ -115,7 +115,7 @@ function initMap() {
         fillColor: '#FF0000',
         fillOpacity: 0.0,
         map: map,
-        center: piediluco,
+        center: villaleri,
         radius: 1000
     });
 
@@ -163,7 +163,7 @@ function initMap() {
         });
 
     // Add a black marker for the finish line
-    createNewMarker("FIN", "black", piediluco.lat, piediluco.lng);
+    createNewMarker("FIN", "black", villaleri.lat, villaleri.lng);
 
     drawGeoJsonRegions();
 
