@@ -17,53 +17,6 @@ var gps_tolerance_radius_pp = null;
 var center = [villaleri.lat, villaleri.lng];
 var zoom = 9;
 
-
-function initLeafletMap() {
-    console.log(center);
-    // unset the google map
-    var container = L.DomUtil.get('map');
-    if (container != null) {
-        container._leaflet_id = null;
-    }
-    var map = L.map('map').setView(center, zoom);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    var finish_line = L.marker([villaleri.lat, villaleri.lng]).addTo(map);
-
-    radii.forEach(radius => {
-        var circle = L.circle([villaleri.lat, villaleri.lng], {
-            color: 'red',
-            fillColor: '#f03',
-            fillOpacity: 0.0,
-            radius: radius
-        }).addTo(map);
-    });
-
-
-    // you can set .my-div-icon styles in CSS
-
-    // Fetch the data from the JSON file in the GitHub repository
-    fetch('https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_2025.json')
-        .then(response => response.json())
-        .then(data => {
-            Object.keys(data).forEach(key => {
-                const [pointType, lat, lng] = data[key];
-                var color = colors[pointType] || "green"; // Default color if type not found
-
-                if (color == "red") {
-                    var myIcon = L.divIcon({ className: 'marker-tag gp_marker', html: key });
-                } else {
-                    var myIcon = L.divIcon({ className: 'marker-tag', html: key });
-                }
-
-                L.marker([lat, lng], { icon: myIcon }).addTo(map);
-
-            });
-        });
-}
-
 function drawGeoJsonRegions() {
     fetch('https://raw.githubusercontent.com/openpolis/geojson-italy/master/geojson/limits_IT_regions.geojson')
         .then(response => response.json())
@@ -150,8 +103,15 @@ function initMap() {
         });
     }
 
+    let url = "https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_2025.json"
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("old") == "use") {
+        url = "https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_2024.json"
+    }
+
     // Fetch the data from the JSON file in the GitHub repository
-    fetch('https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_2025.json')
+    fetch(url)
         .then(response => response.json())
         .then(data => {
             Object.keys(data).forEach(key => {
@@ -161,6 +121,25 @@ function initMap() {
                 createNewMarker(key, color, lat, lng)
             });
         });
+
+    if (urlParams.get("old") == "show") {
+        fetch('https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_2024.json')
+            .then(response => response.json())
+            .then(data => {
+                Object.keys(data).forEach(key => {
+                    const [pointType, lat, lng] = data[key];
+                    const markerTag = document.createElement("div");
+                    markerTag.className = "marker-tag old_marker";
+                    // markerTag.textContent = key;
+                    new google.maps.marker.AdvancedMarkerElement({
+                        position: new google.maps.LatLng(lat, lng),
+                        map: map,
+                        title: key,
+                        content: markerTag
+                    });
+                });
+            });
+    }
 
     // Add a black marker for the finish line
     createNewMarker("FIN", "black", villaleri.lat, villaleri.lng);
@@ -191,6 +170,14 @@ function updatePath() {
     } else {
         countDiv.textContent = 'Path Items: ' + (path.length) + " (no finish)";
     }
+
+    markers.forEach(marker => {
+        // remove marker_path class
+        marker.content.classList.remove("marker_path");
+    });
+    path.forEach(marker => {
+        marker.content.classList.add("marker_path");
+    });
 
     path.forEach((marker, index) => {
         const div = document.createElement('div');
@@ -433,27 +420,7 @@ function eraseCookie(name) {
     document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 }
 
-function switchMapType() {
-    center = [map.getCenter().lat(), map.getCenter().lng()];
-    zoom = map.getZoom();
-    if (cur_map == "leaflet") {
-        // Set the cookie to "google"
-        cur_map = "google";
-        // Reload the page
-        initMap();
-    } else {
-        // Set the cookie to "leaflet"
-        cur_map = "leaflet";
-        // Reload the page
-        initLeafletMap();
-    }
-}
 
-if (cur_map == "leaflet") {
-    // Call initMap to render the map
-    window.onload = initLeafletMap;
-} else {
-    // Call initMap to render the map
-    window.onload = initMap;
-}
+// Call initMap to render the map
+window.onload = initMap;
 
