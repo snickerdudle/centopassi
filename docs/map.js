@@ -1,7 +1,7 @@
 var map, path = [], cursor, line, markers = [];
 var cur_map = "google";
 
-const villaleri = { lat: 43.93066494461769, lng: 12.589408458124268 };
+const villaleri = { lat: 43.930372, lng: 12.591069 };
 const radii = [50000, 100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000]; // radii in meters
 // Define colors for different types of points
 var colors = {
