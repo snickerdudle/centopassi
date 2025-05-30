@@ -126,6 +126,12 @@
             display: flex;
             align-items: center;
         }
+
+        .marker-highlight {
+            border: 3px solid #ffe066 !important;
+            box-shadow: 0 0 12px 4px #ffe066 !important;
+            z-index: 1000;
+        }
     </style>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
@@ -156,11 +162,10 @@
                 <button onclick="importPath()"><span class="material-symbols-outlined">upload_file</span><span>Import
                         Path</span></button>
                 <input type="text" id="maps-count" />
-                <button onclick="generateAndOpenGoogleMapsLink()"><span
-                        class="material-symbols-outlined">explore</span><span>Google Maps Link</span></button>
+                <button onclick="generateAndOpenGoogleMapsLink()" onmouseenter="previewGoogleMapsLinkMarkers()" onmouseleave="clearPreviewGoogleMapsLinkMarkers()"><span
+                        class="material-symbols-outlined">explore</span><span>Google Maps (Up to Current)</span></button>
                 <button onclick="generateAndOpenGoogleMapsLinks()"><span
-                        class="material-symbols-outlined">travel_explore</span><span>Google Maps Links
-                        (All)</span></button>
+                        class="material-symbols-outlined">travel_explore</span><span>Google Maps (All)</span></button>
                 <button onclick="reversePath()"><span class="material-symbols-outlined">autorenew</span><span>Reverse
                         Path</span></button>
 

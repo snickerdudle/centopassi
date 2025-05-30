@@ -295,7 +295,7 @@ function updatePath() {
     line.setPath(pathCoordinates);
     // Add arrows at regular intervals along the path
     const arrowIcons = [];
-    const arrowCount = path.length - 1; // Number of arrows (segments)
+    const arrowCount = path.length; // Number of arrows (segments)
     for (let i = 1; i < arrowCount; i++) {
         arrowIcons.push({
             icon: {
@@ -465,6 +465,28 @@ function eraseCookie(name) {
     document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 }
 
+// Highlight the markers that would be included in the Google Maps link
+function previewGoogleMapsLinkMarkers() {
+    const n = $("#maps-count").val();
+    if (!cursor || path.length === 0) return;
+    let pathx = path.slice(0, path.indexOf(cursor) + 1);
+    if (n < pathx.length) {
+        pathx = pathx.slice(pathx.length - n);
+    }
+    markers.forEach(marker => {
+        marker.content.classList.remove("marker-highlight");
+    });
+    pathx.forEach(marker => {
+        marker.content.classList.add("marker-highlight");
+    });
+}
+
+// Remove highlight from all markers
+function clearPreviewGoogleMapsLinkMarkers() {
+    markers.forEach(marker => {
+        marker.content.classList.remove("marker-highlight");
+    });
+}
 
 // Call initMap to render the map
 window.onload = initMap;
