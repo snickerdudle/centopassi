@@ -160,13 +160,24 @@ function initMap() {
 
     drawGeoJsonRegions();
 
-    // Initialize the polyline
+    // Initialize the polyline with an arrow symbol at the end
     line = new google.maps.Polyline({
         strokeColor: '#000000',
         strokeOpacity: 1.0,
         strokeWeight: 3,
         map: map,
-        zIndex: 10
+        zIndex: 10,
+        icons: [{
+            icon: {
+                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                scale: 3,
+                strokeColor: '#000',
+                strokeWeight: 2,
+                fillColor: '#fff',
+                fillOpacity: 1
+            },
+            offset: '100%'
+        }]
     });
 
     $("#maps-count").val(20);
@@ -279,8 +290,28 @@ function updatePath() {
     });
     $("#path-panel-contents").disableSelection();
 
+    // Update the polyline path and arrows dynamically
     const pathCoordinates = path.map(marker => marker.position);
     line.setPath(pathCoordinates);
+    // Add arrows at regular intervals along the path
+    const arrowIcons = [];
+    const arrowCount = path.length - 1; // Number of arrows (segments)
+    for (let i = 1; i < arrowCount; i++) {
+        arrowIcons.push({
+            icon: {
+                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                scale: 3,
+                strokeColor: '#000',
+                strokeWeight: 2,
+                fillColor: '#fff',
+                fillOpacity: 1
+            },
+            offset: `${(i * 100) / arrowCount}%`
+        });
+    }
+    line.setOptions({
+        icons: arrowIcons
+    });
 }
 
 // Add calls to updatePathPanel in addToPath and removeFromPath to ensure the count updates
