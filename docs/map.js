@@ -1,20 +1,32 @@
 var map, path = [], cursor, line, markers = [];
 var cur_map = "google";
 
-const villaleri = { lat: 43.930372, lng: 12.591069 };
+// 
+// IMPORTANT: CHANGE THESE VALUES WHEN CHANGING THE YEAR:
+const CURRENT_YEAR = 2025;
+const FINISH_LINE_COORDS = { lat: 43.930372, lng: 12.591069 }; // Villaleri, Italy
+// IMPORTANT: CHANGE THESE VALUES WHEN CHANGING THE YEAR:
+
 const radii = [50000, 100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000]; // radii in meters
 // Define colors for different types of points
 var colors = {
     "PP": "blue",  // Color for PP points
     "GP": "red"    // Color for GP points
 };
+const past_years = [];
+for (let i = 2024; i < CURRENT_YEAR; i++) {
+    past_years.push(i.toString());
+}
+
+// Set the page title to Centopassi CURRENT_YEAR Planner
+document.title = `Centopassi ${CURRENT_YEAR} Planner`;
 
 var last_circle_5 = null;
 var last_circle_15 = null;
 var gps_tolerance_radius_gp = null;
 var gps_tolerance_radius_pp = null;
 
-var center = [villaleri.lat, villaleri.lng];
+var center = [FINISH_LINE_COORDS.lat, FINISH_LINE_COORDS.lng];
 var zoom = 9;
 
 function drawGeoJsonRegions() {
@@ -43,7 +55,7 @@ function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         zoom: zoom,
         center: { lat: center[0], lng: center[1] },
-        mapId: "CENTOPASSI_2025_EDITOR"
+        mapId: `CENTOPASSI_${CURRENT_YEAR}_EDITOR`
     });
 
 
@@ -56,7 +68,7 @@ function initMap() {
             fillColor: '#FF0000',
             fillOpacity: 0.0,
             map: map,
-            center: villaleri,
+            center: FINISH_LINE_COORDS,
             radius: radius
         });
     });
@@ -68,7 +80,7 @@ function initMap() {
         fillColor: '#FF0000',
         fillOpacity: 0.0,
         map: map,
-        center: villaleri,
+        center: FINISH_LINE_COORDS,
         radius: 1000
     });
 
@@ -103,11 +115,12 @@ function initMap() {
         });
     }
 
-    let url = "https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_2025.json"
+    let url = `https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_${CURRENT_YEAR}.json`
 
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("old") == "use") {
-        url = "https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_2024.json"
+        const previous_year = past_years[past_years.length - 1];
+        url = `https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_${previous_year}.json`
     }
 
     // Fetch the data from the JSON file in the GitHub repository
@@ -123,7 +136,8 @@ function initMap() {
         });
 
     if (urlParams.get("old") == "show") {
-        fetch('https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_2024.json')
+        const previous_year = past_years[past_years.length - 1];
+        fetch(`https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_${previous_year}.json`)
             .then(response => response.json())
             .then(data => {
                 Object.keys(data).forEach(key => {
@@ -142,7 +156,7 @@ function initMap() {
     }
 
     // Add a black marker for the finish line
-    createNewMarker("FIN", "black", villaleri.lat, villaleri.lng);
+    createNewMarker("FIN", "black", FINISH_LINE_COORDS.lat, FINISH_LINE_COORDS.lng);
 
     drawGeoJsonRegions();
 
