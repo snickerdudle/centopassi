@@ -477,7 +477,7 @@ function copyToClipboard(lat, lng) {
     });
 }
 
-function generateAndOpenGoogleMapsLink() {
+function generateAndOpenGoogleMapsLink(reversed = false) {
     const n = $("#maps-count").val();
     var pathx = path.slice(0, path.indexOf(cursor) + 1);
     if (n < pathx.length) {
@@ -487,6 +487,10 @@ function generateAndOpenGoogleMapsLink() {
     if (pathx.length === 0) {
         alert("No markers in the path.");
         return;
+    }
+
+    if (reversed) {
+        pathx = pathx.slice().reverse();
     }
 
     const baseUrl = 'https://www.google.com/maps/dir/';
