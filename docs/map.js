@@ -431,6 +431,8 @@ function updatePath() {
         }));
     }
 
+    refreshRouteLegs();
+
     savePath();
 }
 
@@ -521,7 +523,6 @@ function _pumpLegQueue() {
                 };
                 saveLegCache();
                 updatePath();
-                if (_routesVisible) drawRouteLeg(key);
             }
             _pumpLegQueue();
         });
@@ -548,11 +549,6 @@ function drawRouteLeg(key) {
     });
 }
 
-function showAllRouteLegs() {
-    const cache = loadLegCache();
-    for (const key in cache) drawRouteLeg(key);
-}
-
 function clearAllRouteLegs() {
     for (const key in _routePolylines) {
         _routePolylines[key].setMap(null);
@@ -560,10 +556,26 @@ function clearAllRouteLegs() {
     }
 }
 
+// Redraw only the polylines for legs that lie between consecutive path items.
+function refreshRouteLegs() {
+    const desired = new Set();
+    for (let i = 0; i < path.length - 1; i++) {
+        desired.add(legKey(path[i].position, path[i + 1].position));
+    }
+    for (const key in _routePolylines) {
+        if (!desired.has(key)) {
+            _routePolylines[key].setMap(null);
+            delete _routePolylines[key];
+        }
+    }
+    if (!_routesVisible) return;
+    desired.forEach(drawRouteLeg);
+}
+
 function toggleRoutes() {
     _routesVisible = !_routesVisible;
     if (_routesVisible) {
-        showAllRouteLegs();
+        refreshRouteLegs();
     } else {
         clearAllRouteLegs();
     }
