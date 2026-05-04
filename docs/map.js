@@ -135,8 +135,13 @@ async function initMap() {
         });
         markers.push(marker);
 
-        // Click listener for each marker
-        marker.addListener('click', function () {
+        // Click listener for each marker (shift-click removes from path)
+        marker.addListener('click', function (e) {
+            if (e && e.domEvent && e.domEvent.shiftKey) {
+                const idx = path.indexOf(marker);
+                if (idx >= 0) removeFromPath(idx);
+                return;
+            }
             addToPath(marker);
         });
 
@@ -257,13 +262,39 @@ function updatePath() {
         marker.content.classList.add("marker_path");
     });
 
+    const legCache = loadLegCache();
+
+    // Compute total/per-pass driving time
+    const timeDiv = document.getElementById('path-time');
+    if (timeDiv) {
+        let totalSec = 0;
+        let knownLegs = 0;
+        for (let i = 0; i < path.length - 1; i++) {
+            const k = legKey(path[i].position, path[i + 1].position);
+            const d = legDuration(legCache[k]);
+            if (d != null) { totalSec += d; knownLegs++; }
+        }
+        const expectedLegs = Math.max(path.length - 1, 0);
+        if (expectedLegs === 0) {
+            timeDiv.textContent = '';
+        } else {
+            const totalMin = Math.round(totalSec / 60);
+            const perPassMin = Math.round((totalSec / expectedLegs) / 60);
+            const partial = knownLegs < expectedLegs ? ` (${knownLegs}/${expectedLegs} legs)` : '';
+            timeDiv.textContent = `Driving: ${totalMin} min total · ${perPassMin} min/pass${partial}`;
+        }
+    }
+
     path.forEach((marker, index) => {
         const div = document.createElement('div');
         div.className = 'path-item';
-        div.textContent = marker.title;
         div.setAttribute('data-index', index);
         if (marker === cursor)
             div.classList.add('cursor');
+
+        const titleSpan = document.createElement('span');
+        titleSpan.textContent = marker.title;
+        div.appendChild(titleSpan);
 
         const removeBtn = document.createElement('span');
         removeBtn.textContent = 'x';
@@ -271,8 +302,23 @@ function updatePath() {
         removeBtn.onclick = function () {
             removeFromPath(index);
         };
-
         div.appendChild(removeBtn);
+
+        if (index < path.length - 1) {
+            const next = path[index + 1];
+            const key = legKey(marker.position, next.position);
+            const durSpan = document.createElement('span');
+            durSpan.className = 'leg-duration';
+            const dur = legDuration(legCache[key]);
+            if (dur != null) {
+                durSpan.textContent = `→ ${Math.round(dur / 60)} min`;
+            } else {
+                durSpan.textContent = '→ …';
+                fetchLeg(marker.position, next.position);
+            }
+            div.appendChild(durSpan);
+        }
+
         panel.appendChild(div);
     });
 
@@ -367,6 +413,124 @@ function updatePath() {
     });
 
     savePath();
+}
+
+const LEG_CACHE_KEY = "centopassi_leg_durations";
+let _legCache = null;
+let _directionsService = null;
+const _legQueue = [];
+const _legPending = new Set();
+let _legInFlight = 0;
+const _legMaxConcurrent = 5;
+
+function _coordPair(pos) {
+    if (typeof pos.lat === 'function') return [pos.lat(), pos.lng()];
+    return [pos.lat, pos.lng];
+}
+
+function legKey(a, b) {
+    const [alat, alng] = _coordPair(a);
+    const [blat, blng] = _coordPair(b);
+    return `${alat.toFixed(6)},${alng.toFixed(6)}->${blat.toFixed(6)},${blng.toFixed(6)}`;
+}
+
+function loadLegCache() {
+    if (_legCache) return _legCache;
+    try {
+        _legCache = JSON.parse(localStorage.getItem(LEG_CACHE_KEY) || "{}");
+    } catch (e) {
+        _legCache = {};
+    }
+    // Migrate legacy entries (just a number) to {d, p}
+    for (const k in _legCache) {
+        if (typeof _legCache[k] === "number") _legCache[k] = { d: _legCache[k], p: null };
+    }
+    return _legCache;
+}
+
+function legDuration(entry) {
+    return entry == null ? null : (typeof entry === "number" ? entry : entry.d);
+}
+
+function saveLegCache() {
+    try { localStorage.setItem(LEG_CACHE_KEY, JSON.stringify(_legCache)); } catch (e) { /* quota */ }
+}
+
+function fetchLeg(a, b) {
+    const key = legKey(a, b);
+    const cache = loadLegCache();
+    if (key in cache) return;
+    if (_legPending.has(key)) return;
+    _legPending.add(key);
+    _legQueue.push({ key, a, b });
+    _pumpLegQueue();
+}
+
+function _pumpLegQueue() {
+    if (!_directionsService) _directionsService = new google.maps.DirectionsService();
+    while (_legInFlight < _legMaxConcurrent && _legQueue.length > 0) {
+        const { key, a, b } = _legQueue.shift();
+        _legInFlight++;
+        _directionsService.route({
+            origin: a,
+            destination: b,
+            travelMode: google.maps.TravelMode.DRIVING,
+            avoidHighways: true,
+        }, (result, status) => {
+            _legInFlight--;
+            _legPending.delete(key);
+            if (status === "OK" && result.routes[0] && result.routes[0].legs[0]) {
+                const route = result.routes[0];
+                _legCache[key] = {
+                    d: route.legs[0].duration.value,
+                    p: route.overview_polyline || null,
+                };
+                saveLegCache();
+                updatePath();
+                if (_routesVisible) drawRouteLeg(key);
+            }
+            _pumpLegQueue();
+        });
+    }
+}
+
+let _routesVisible = false;
+const _routePolylines = {}; // key -> google.maps.Polyline
+
+function drawRouteLeg(key) {
+    if (_routePolylines[key]) return;
+    const entry = loadLegCache()[key];
+    if (!entry || !entry.p || !entry.p.points) return;
+    const path = google.maps.geometry.encoding.decodePath(entry.p.points);
+    _routePolylines[key] = new google.maps.Polyline({
+        path,
+        strokeColor: "#1565c0",
+        strokeOpacity: 0.7,
+        strokeWeight: 4,
+        map,
+        zIndex: 5,
+    });
+}
+
+function showAllRouteLegs() {
+    const cache = loadLegCache();
+    for (const key in cache) drawRouteLeg(key);
+}
+
+function clearAllRouteLegs() {
+    for (const key in _routePolylines) {
+        _routePolylines[key].setMap(null);
+        delete _routePolylines[key];
+    }
+}
+
+function toggleRoutes() {
+    _routesVisible = !_routesVisible;
+    if (_routesVisible) {
+        showAllRouteLegs();
+    } else {
+        clearAllRouteLegs();
+    }
 }
 
 function pathStorageKey() {

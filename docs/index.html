@@ -60,6 +60,13 @@
             cursor: pointer;
         }
 
+        .leg-duration {
+            display: block;
+            font-size: 11px;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+
         .marker-tag {
             background-color: blue;
             color: white;
@@ -184,6 +191,7 @@
         <div id="map"></div>
         <div id="path-panel">
             <div id="path-count">Path Items: 0</div>
+            <div id="path-time"></div>
             <div id="path-panel-contents"></div>
             <div id="control-panel">
                 <button onclick="exportPath()"><span class="material-symbols-outlined">save</span><span>Export
@@ -202,6 +210,8 @@
                         Path</span></button>
                 <button onclick="toggleTrafficLayer()"><span class="material-symbols-outlined">traffic</span><span>Toggle
                         Traffic</span></button>
+                <button onclick="toggleRoutes()"><span class="material-symbols-outlined">route</span><span>Toggle
+                        Routes</span></button>
 
                 <!-- <hr>
                 <button onclick="switchMapType()"><span class="material-symbols-outlined">autorenew</span><span>Switch
