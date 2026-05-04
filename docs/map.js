@@ -287,7 +287,7 @@ function updatePath() {
                 const mins = Math.round(dur / 60);
                 durSpan.textContent = `→ ${mins} min`;
                 if (mins < 20) durSpan.classList.add('leg-fast');
-                else if (mins > 24) durSpan.classList.add('leg-slow');
+                else if (mins > 29) durSpan.classList.add('leg-slow');
             } else {
                 durSpan.textContent = '→ …';
                 fetchLeg(marker.position, next.position);
@@ -384,7 +384,7 @@ function updatePath() {
         if (dur != null) {
             const mins = Math.round(dur / 60);
             if (mins < 20) color = '#2e7d32';
-            else if (mins > 24) color = '#c62828';
+            else if (mins > 29) color = '#c62828';
         }
         segmentLines.push(new google.maps.Polyline({
             path: [a.position, b.position],

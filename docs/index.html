@@ -38,6 +38,16 @@
             padding: 10px;
         }
 
+        #path-header {
+            position: sticky;
+            top: -10px;
+            margin: -10px -10px 0 -10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #ccc;
+            z-index: 100;
+        }
+
         .path-item {
             padding: 5px;
             background-color: #e9ecef;
@@ -198,8 +208,10 @@
     <div class="content">
         <div id="map"></div>
         <div id="path-panel">
-            <div id="path-count">Path Items: 0</div>
-            <div id="path-time"></div>
+            <div id="path-header">
+                <div id="path-count">Path Items: 0</div>
+                <div id="path-time"></div>
+            </div>
             <div id="path-panel-contents"></div>
             <div id="control-panel">
                 <button onclick="exportPath()"><span class="material-symbols-outlined">save</span><span>Export
