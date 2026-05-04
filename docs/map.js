@@ -295,6 +295,28 @@ function updatePath() {
             div.appendChild(durSpan);
         }
 
+        if (index > 0 && index < path.length - 1) {
+            const prev = path[index - 1];
+            const next = path[index + 1];
+            const kPA = legKey(prev.position, marker.position);
+            const kAN = legKey(marker.position, next.position);
+            const kPN = legKey(prev.position, next.position);
+            const dPA = legDuration(legCache[kPA]);
+            const dAN = legDuration(legCache[kAN]);
+            const dPN = legDuration(legCache[kPN]);
+            const skipSpan = document.createElement('span');
+            skipSpan.className = 'skip-cost';
+            if (dPA != null && dAN != null && dPN != null) {
+                const skipMin = Math.round((dPA + dAN - dPN) / 60);
+                skipSpan.textContent = `skip: ${skipMin} min`;
+                if (skipMin > 24) skipSpan.classList.add('skip-slow');
+            } else {
+                skipSpan.textContent = 'skip: …';
+                if (dPN == null) fetchLeg(prev.position, next.position);
+            }
+            div.appendChild(skipSpan);
+        }
+
         const removeBtn = document.createElement('span');
         removeBtn.textContent = 'x';
         removeBtn.className = 'path-remove';
