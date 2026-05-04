@@ -96,6 +96,41 @@
             transform: translate(0, 5px);
         }
 
+        .marker-tag.annulled_marker {
+            position: relative;
+            opacity: 0.6;
+        }
+
+        .marker-tag.annulled_marker::before,
+        .marker-tag.annulled_marker::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 140%;
+            height: 3px;
+            background-color: red;
+            box-shadow: 0 0 2px white;
+            pointer-events: none;
+        }
+
+        .marker-tag.annulled_marker::before {
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .marker-tag.annulled_marker::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+
+        .marker-tag.track_marker {
+            background-color: purple;
+            height: 14px;
+            width: 14px;
+            border: 2px solid white;
+            box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+            transform: translate(0, 7px);
+        }
+
         .marker-tag.gp_marker.marker_path {
             background-color: #ff8e8e !important;
             border: 3px solid white;

@@ -61,6 +61,15 @@ async function initMap() {
     const response = await fetch(url);
     const data = await response.json();
 
+    // Fetch optional notes (annulled / restricted points) for the current year
+    let notes = {};
+    if (urlParams.get("old") != "use") {
+        try {
+            const notes_resp = await fetch(`https://raw.githubusercontent.com/snickerdudle/centopassi/main/notes_${CURRENT_YEAR}.json`);
+            if (notes_resp.ok) notes = await notes_resp.json();
+        } catch (e) { /* notes file is optional */ }
+    }
+
     // Set FINISH_LINE_COORDS from the JSON if present
     if (data["FIN"]) {
         console.log(data["FIN"]);
@@ -144,6 +153,17 @@ async function initMap() {
         var color = colors[pointType] || "green"; // Default color if type not found
 
         createNewMarker(key, color, lat, lng)
+
+        const note = notes[key];
+        if (note) {
+            const marker = markers[markers.length - 1];
+            if (note.status === "annulled") {
+                marker.content.classList.add("annulled_marker");
+            }
+            if (note.message) {
+                marker.title = note.message;
+            }
+        }
     });
     // Add a black marker for the finish line (after coords are set)
     createNewMarker("FIN", "black", FINISH_LINE_COORDS.lat, FINISH_LINE_COORDS.lng);
@@ -161,6 +181,31 @@ async function initMap() {
                 position: new google.maps.LatLng(lat, lng),
                 map: map,
                 title: key,
+                content: markerTag
+            });
+        });
+    }
+
+    if (urlParams.get("old") == "track") {
+        const previous_year = past_years[past_years.length - 1];
+        const [previous_year_resp, track_resp] = await Promise.all([
+            fetch(`https://raw.githubusercontent.com/snickerdudle/centopassi/main/centopassi_${previous_year}.json`),
+            fetch(`https://raw.githubusercontent.com/snickerdudle/centopassi/main/track_${previous_year}.json`)
+        ]);
+        const previous_year_data_json = await previous_year_resp.json();
+        const track_keys = await track_resp.json();
+        track_keys.forEach(key => {
+            const entry = previous_year_data_json[key];
+            if (!entry) return;
+            const [pointType, lat, lng] = entry;
+            if (pointType === "FIN") return; // Finish line already drawn for current year
+            const markerTag = document.createElement("div");
+            markerTag.className = "marker-tag track_marker";
+            markerTag.textContent = key;
+            new google.maps.marker.AdvancedMarkerElement({
+                position: new google.maps.LatLng(lat, lng),
+                map: map,
+                title: `${previous_year}: ${key}`,
                 content: markerTag
             });
         });
