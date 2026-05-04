@@ -215,7 +215,6 @@ async function initMap() {
         });
     }
 
-    drawGeoJsonRegions();
 
     $("#maps-count").val(20);
 
