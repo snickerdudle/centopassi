@@ -1,10 +1,10 @@
 var map, path = [], cursor, line, markers = [];
 var cur_map = "google";
 
-// 
+//
 // IMPORTANT: CHANGE THESE VALUES WHEN CHANGING THE YEAR:
-const CURRENT_YEAR = 2025;
-let FINISH_LINE_COORDS = { lat: 41.88988786190099, lng: 12.492331797827742 }; // Default, will be overwritten from the JSON
+const CURRENT_YEAR = 2026;
+let FINISH_LINE_COORDS = { lat: 41.9370873, lng: 15.9550457 }; // Default, will be overwritten from the JSON
 // IMPORTANT: CHANGE THESE VALUES WHEN CHANGING THE YEAR:
 
 const radii = [50000, 100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000]; // radii in meters, 50km gap between each radius
