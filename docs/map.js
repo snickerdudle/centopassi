@@ -232,6 +232,8 @@ async function initMap() {
     });
 
     $("#maps-count").val(20);
+
+    loadPath();
 }
 
 function updatePath() {
@@ -363,6 +365,34 @@ function updatePath() {
     line.setOptions({
         icons: arrowIcons
     });
+
+    savePath();
+}
+
+function pathStorageKey() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const year = urlParams.get("old") == "use" ? past_years[past_years.length - 1] : CURRENT_YEAR;
+    return `centopassi_path_${year}`;
+}
+
+function savePath() {
+    try {
+        const keys = path.map(marker => marker.title);
+        const cursorKey = cursor ? cursor.title : null;
+        localStorage.setItem(pathStorageKey(), JSON.stringify({ keys, cursor: cursorKey }));
+    } catch (e) { /* localStorage may be unavailable */ }
+}
+
+function loadPath() {
+    try {
+        const raw = localStorage.getItem(pathStorageKey());
+        if (!raw) return;
+        const { keys, cursor: cursorKey } = JSON.parse(raw);
+        if (!Array.isArray(keys)) return;
+        path = keys.map(key => markers.find(m => m.title === key)).filter(Boolean);
+        cursor = path.find(m => m.title === cursorKey) || path[path.length - 1] || undefined;
+        updatePath();
+    } catch (e) { /* ignore corrupt storage */ }
 }
 
 // Add calls to updatePathPanel in addToPath and removeFromPath to ensure the count updates
