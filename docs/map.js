@@ -303,7 +303,10 @@ function updatePath() {
             durSpan.className = 'leg-duration';
             const dur = legDuration(legCache[key]);
             if (dur != null) {
-                durSpan.textContent = `→ ${Math.round(dur / 60)} min`;
+                const mins = Math.round(dur / 60);
+                durSpan.textContent = `→ ${mins} min`;
+                if (mins < 20) durSpan.classList.add('leg-fast');
+                else if (mins > 24) durSpan.classList.add('leg-slow');
             } else {
                 durSpan.textContent = '→ …';
                 fetchLeg(marker.position, next.position);
