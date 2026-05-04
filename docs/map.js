@@ -193,19 +193,17 @@ async function initMap() {
             fetch(`https://raw.githubusercontent.com/snickerdudle/centopassi/main/track_${previous_year}.json`)
         ]);
         const previous_year_data_json = await previous_year_resp.json();
-        const track_keys = await track_resp.json();
-        track_keys.forEach(key => {
-            const entry = previous_year_data_json[key];
-            if (!entry) return;
-            const [pointType, lat, lng] = entry;
-            if (pointType === "FIN") return; // Finish line already drawn for current year
+        const track_keys = new Set(await track_resp.json());
+        Object.keys(previous_year_data_json).forEach(key => {
+            if (key === "FIN" || previous_year_data_json[key][0] === "FIN") return;
+            const [pointType, lat, lng] = previous_year_data_json[key];
             const markerTag = document.createElement("div");
-            markerTag.className = "marker-tag track_marker";
-            markerTag.textContent = key;
+            markerTag.className = "marker-tag old_marker";
+            if (track_keys.has(key)) markerTag.classList.add("track_marker");
             new google.maps.marker.AdvancedMarkerElement({
                 position: new google.maps.LatLng(lat, lng),
                 map: map,
-                title: `${previous_year}: ${key}`,
+                title: key,
                 content: markerTag
             });
         });
