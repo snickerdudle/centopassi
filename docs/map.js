@@ -1,4 +1,4 @@
-var map, path = [], cursor, line, markers = [];
+var map, path = [], cursor, line, markers = [], trafficLayer = null;
 var cur_map = "google";
 
 //
@@ -425,6 +425,17 @@ function importPath() {
         }
     });
     fileInput.click(); // Open file dialog
+}
+
+function toggleTrafficLayer() {
+    if (!map) return;
+    if (trafficLayer) {
+        trafficLayer.setMap(null);
+        trafficLayer = null;
+    } else {
+        trafficLayer = new google.maps.TrafficLayer();
+        trafficLayer.setMap(map);
+    }
 }
 
 function copyToClipboard(lat, lng) {
