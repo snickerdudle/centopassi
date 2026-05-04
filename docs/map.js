@@ -272,6 +272,8 @@ function updatePath() {
         div.setAttribute('data-index', index);
         if (marker === cursor)
             div.classList.add('cursor');
+        if (marker.content && marker.content.classList.contains('gp_marker'))
+            div.classList.add('path-item-gp');
 
         const titleSpan = document.createElement('span');
         titleSpan.textContent = marker.title;
