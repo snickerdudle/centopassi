@@ -1,4 +1,5 @@
-var map, path = [], cursor, line, markers = [], trafficLayer = null;
+var map, path = [], cursor, markers = [], trafficLayer = null;
+var segmentLines = [];
 var cur_map = "google";
 
 //
@@ -216,26 +217,6 @@ async function initMap() {
 
     drawGeoJsonRegions();
 
-    // Initialize the polyline
-    line = new google.maps.Polyline({
-        strokeColor: '#000000',
-        strokeOpacity: 1.0,
-        strokeWeight: 3,
-        map: map,
-        zIndex: 10,
-        icons: [{
-            icon: {
-                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                scale: 3,
-                strokeColor: '#000',
-                strokeWeight: 2,
-                fillColor: '#fff',
-                fillOpacity: 1
-            },
-            offset: '100%'
-        }]
-    });
-
     $("#maps-count").val(20);
 
     loadPath();
@@ -392,28 +373,39 @@ function updatePath() {
     });
     $("#path-panel-contents").disableSelection();
 
-    // Update the polyline path and arrows dynamically
-    const pathCoordinates = path.map(marker => marker.position);
-    line.setPath(pathCoordinates);
-    // Add arrows at regular intervals along the path
-    const arrowIcons = [];
-    const arrowCount = path.length; // Number of arrows (segments)
-    for (let i = 1; i < arrowCount; i++) {
-        arrowIcons.push({
-            icon: {
-                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                scale: 3,
-                strokeColor: '#000',
-                strokeWeight: 2,
-                fillColor: '#fff',
-                fillOpacity: 1
-            },
-            offset: `${(i * 100) / arrowCount}%`
-        });
+    // Redraw colored polyline segments per leg
+    segmentLines.forEach(seg => seg.setMap(null));
+    segmentLines = [];
+    for (let i = 0; i < path.length - 1; i++) {
+        const a = path[i], b = path[i + 1];
+        const k = legKey(a.position, b.position);
+        const dur = legDuration(legCache[k]);
+        let color = '#000000';
+        if (dur != null) {
+            const mins = Math.round(dur / 60);
+            if (mins < 20) color = '#2e7d32';
+            else if (mins > 24) color = '#c62828';
+        }
+        segmentLines.push(new google.maps.Polyline({
+            path: [a.position, b.position],
+            strokeColor: color,
+            strokeOpacity: 1.0,
+            strokeWeight: 3,
+            map,
+            zIndex: 10,
+            icons: [{
+                icon: {
+                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                    scale: 3,
+                    strokeColor: color,
+                    strokeWeight: 2,
+                    fillColor: '#fff',
+                    fillOpacity: 1
+                },
+                offset: '100%'
+            }]
+        }));
     }
-    line.setOptions({
-        icons: arrowIcons
-    });
 
     savePath();
 }
