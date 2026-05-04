@@ -296,14 +296,6 @@ function updatePath() {
         titleSpan.textContent = marker.title;
         div.appendChild(titleSpan);
 
-        const removeBtn = document.createElement('span');
-        removeBtn.textContent = 'x';
-        removeBtn.className = 'path-remove';
-        removeBtn.onclick = function () {
-            removeFromPath(index);
-        };
-        div.appendChild(removeBtn);
-
         if (index < path.length - 1) {
             const next = path[index + 1];
             const key = legKey(marker.position, next.position);
@@ -318,6 +310,14 @@ function updatePath() {
             }
             div.appendChild(durSpan);
         }
+
+        const removeBtn = document.createElement('span');
+        removeBtn.textContent = 'x';
+        removeBtn.className = 'path-remove';
+        removeBtn.onclick = function () {
+            removeFromPath(index);
+        };
+        div.appendChild(removeBtn);
 
         panel.appendChild(div);
     });
@@ -415,7 +415,9 @@ function updatePath() {
     savePath();
 }
 
-const LEG_CACHE_KEY = "centopassi_leg_durations";
+const LEG_CACHE_KEY = "centopassi_leg_durations_v2";
+// Wipe legacy directional cache (was keyed A->B, polyline stored as object)
+try { localStorage.removeItem("centopassi_leg_durations"); } catch (e) { /* ignore */ }
 let _legCache = null;
 let _directionsService = null;
 const _legQueue = [];
@@ -431,7 +433,21 @@ function _coordPair(pos) {
 function legKey(a, b) {
     const [alat, alng] = _coordPair(a);
     const [blat, blng] = _coordPair(b);
-    return `${alat.toFixed(6)},${alng.toFixed(6)}->${blat.toFixed(6)},${blng.toFixed(6)}`;
+    const ka = `${alat.toFixed(6)},${alng.toFixed(6)}`;
+    const kb = `${blat.toFixed(6)},${blng.toFixed(6)}`;
+    return ka < kb ? `${ka}|${kb}` : `${kb}|${ka}`;
+}
+
+function _sqDistToFin(pos) {
+    const [lat, lng] = _coordPair(pos);
+    const dlat = lat - FINISH_LINE_COORDS.lat;
+    const dlng = lng - FINISH_LINE_COORDS.lng;
+    return dlat * dlat + dlng * dlng;
+}
+
+// Pick (origin, destination) so destination is the endpoint closer to FIN.
+function _orientToFin(a, b) {
+    return _sqDistToFin(a) > _sqDistToFin(b) ? [a, b] : [b, a];
 }
 
 function loadLegCache() {
@@ -441,15 +457,11 @@ function loadLegCache() {
     } catch (e) {
         _legCache = {};
     }
-    // Migrate legacy entries (just a number) to {d, p}
-    for (const k in _legCache) {
-        if (typeof _legCache[k] === "number") _legCache[k] = { d: _legCache[k], p: null };
-    }
     return _legCache;
 }
 
 function legDuration(entry) {
-    return entry == null ? null : (typeof entry === "number" ? entry : entry.d);
+    return entry == null ? null : entry.d;
 }
 
 function saveLegCache() {
@@ -462,18 +474,19 @@ function fetchLeg(a, b) {
     if (key in cache) return;
     if (_legPending.has(key)) return;
     _legPending.add(key);
-    _legQueue.push({ key, a, b });
+    const [origin, destination] = _orientToFin(a, b);
+    _legQueue.push({ key, origin, destination });
     _pumpLegQueue();
 }
 
 function _pumpLegQueue() {
     if (!_directionsService) _directionsService = new google.maps.DirectionsService();
     while (_legInFlight < _legMaxConcurrent && _legQueue.length > 0) {
-        const { key, a, b } = _legQueue.shift();
+        const { key, origin, destination } = _legQueue.shift();
         _legInFlight++;
         _directionsService.route({
-            origin: a,
-            destination: b,
+            origin,
+            destination,
             travelMode: google.maps.TravelMode.DRIVING,
             avoidHighways: true,
         }, (result, status) => {
@@ -483,7 +496,9 @@ function _pumpLegQueue() {
                 const route = result.routes[0];
                 _legCache[key] = {
                     d: route.legs[0].duration.value,
-                    p: route.overview_polyline || null,
+                    p: typeof route.overview_polyline === "string"
+                        ? route.overview_polyline
+                        : (route.overview_polyline && route.overview_polyline.points) || null,
                 };
                 saveLegCache();
                 updatePath();
@@ -500,8 +515,10 @@ const _routePolylines = {}; // key -> google.maps.Polyline
 function drawRouteLeg(key) {
     if (_routePolylines[key]) return;
     const entry = loadLegCache()[key];
-    if (!entry || !entry.p || !entry.p.points) return;
-    const path = google.maps.geometry.encoding.decodePath(entry.p.points);
+    if (!entry || !entry.p) return;
+    const encoded = typeof entry.p === "string" ? entry.p : entry.p.points;
+    if (!encoded) return;
+    const path = google.maps.geometry.encoding.decodePath(encoded);
     _routePolylines[key] = new google.maps.Polyline({
         path,
         strokeColor: "#1565c0",
